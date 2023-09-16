@@ -1,0 +1,36 @@
+#pragma kernel CSMain
+static const int threadGroupSize = 1024;
+static const float PI = 3.14159265359;
+
+struct Debris
+{
+    float2 displacementXZ;
+    float4 rotation;
+    float semiMajorAxis;
+    float semiMinorAxis;
+    float phase;
+    float currentAngle;    
+};
+
+RWStructuredBuffer<Debris> debris;
+float _ElapsedTime;
+float _MaxOrbitSpeed;
+float _MaxTumbleSpeed;
+
+
+[numthreads(threadGroupSize, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    float radius = length(debris[id.x].displacementXZ);
+    debris[id.x].currentAngle = 0.5; // _MaxOrbitSpeed / (radius + 1) * _ElapsedTime;
+    //float x = debris[id.x].semiMajorAxis * cos(debris[id.x].currentAngle + (debris[id.x].phase * PI / 180));
+    //float z = debris[id.x].semiMinorAxis * sin(debris[id.x].currentAngle + (debris[id.x].phase * PI / 180));
+    //debris[id.x].displacementXZ = float2(x, z);
+    
+    //float tumbleRotation = (_MaxTumbleSpeed / (radius + 1)) * _ElapsedTime;
+    //debris[id.x].rotation = float4(debris[id.x].rotation.x + tumbleRotation,
+    //                                debris[id.x].rotation.y,
+    //                                debris[id.x].rotation.z,
+    //                                debris[id.x].rotation.w);
+
+}
