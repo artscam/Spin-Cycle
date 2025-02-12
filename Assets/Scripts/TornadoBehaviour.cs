@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -7,45 +5,60 @@ public class TornadoBehaviour : MonoBehaviour
 {
     // Start is called before the first frame update
     public float timer;
-    public float newtarget = 5F;
-    public float speed = 10F;
-    public NavMeshAgent nav;
+    public float timescale = 1F;
+    public float speed = 30F;
     public Vector3 target;
     public GameObject bias;
     public float trackingStrength = 0.5F;
+    public int rotation = -1;
+    private NavMeshAgent agent;
 
     void Start()
     {
-        nav = gameObject.GetComponent<NavMeshAgent>();
-        nav.speed = speed;
+        if (NavMesh.SamplePosition(transform.position, out NavMeshHit closestHit, 500, 1))
+        {
+            GetComponent<NavMeshAgent>().Warp(closestHit.position);
+        }
+        agent = GetComponent<NavMeshAgent>();
+        agent.enabled = false;
+        if (agent != null)
+        {
+            agent.enabled = true;
+            agent.speed = speed;
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
         timer += Time.deltaTime;
 
-        if (timer >= newtarget)
+        if (timer >= timescale)
         {
-            newTarget();
+            NewTarget();
             timer = 0;
         }
 
     }
 
-    void newTarget()
+    void NewTarget()
     {
-        float myX = gameObject.transform.position.x;
-        float myZ = gameObject.transform.position.z;
+        float biasX = bias.transform.position.x - transform.position.x;
+        float biasY = bias.transform.position.y - transform.position.y;
+        float biasZ = bias.transform.position.z - transform.position.z;
+        Vector3 biasVector = trackingStrength * new Vector3(biasX, biasY, biasZ);
+        float distance = Random.Range(0, 100);
 
-        float biasX = bias.transform.position.x-myX;
-        float biasZ = bias.transform.position.z-myZ;
+        target = RandomNavSphere(transform.position, biasVector, distance, -1);
+        agent.SetDestination(target);
+    }
 
-        float xPos = myX + Random.Range(myX - 100, myX + 100) + biasX/trackingStrength;
-        float zPos = myZ + Random.Range(myZ - 100, myZ + 100) + biasZ/trackingStrength;
+    public static Vector3 RandomNavSphere(Vector3 origin, Vector3 bias, float distance, int layermask)
+    {
+        Vector3 randomDirection = UnityEngine.Random.insideUnitSphere * distance;
+        randomDirection += origin+bias;
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(randomDirection, out navHit, distance, layermask);
 
-        target = new Vector3(xPos, gameObject.transform.position.y, zPos);
-
-        nav.SetDestination(target);
+        return navHit.position;
     }
 }

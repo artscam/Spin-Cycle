@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\Boids\BoidManager.cs" />
     <Compile Include="Assets\Conifers [BOTD]\Render Pipeline Support\Built-in RP\CTI Runtime Components\Scripts\CTI_CustomWind.cs" />
+    <Compile Include="Assets\Scripts\TerrainHit.cs" />
     <Compile Include="Assets\Scripts\Debris\DebrisSettings.cs" />
     <Compile Include="Assets\Scripts\TornadoForce.cs" />
     <Compile Include="Assets\Scripts\Boids\Spawner.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Assets\Scripts\Boids\Boid.cs" />
     <Compile Include="Assets\Scripts\StabilizerBars.cs" />
     <Compile Include="Assets\Scripts\RayTracing\RayTracingMaster.cs" />
+    <Compile Include="Assets\Scripts\Tethering.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Conifers [BOTD]\Render Pipeline Support\Built-in RP\CTI Runtime Components\Shaders\CTI_LOD_Bark_Array_301.shader" />

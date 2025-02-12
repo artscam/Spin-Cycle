@@ -14,11 +14,9 @@ public class DebrisManager : MonoBehaviour
     void Start()
     {
         debris = FindObjectsOfType<Debris>();
-        //Debug.Log("number of debris = " + debris.Length);
         foreach (Debris d in debris)
         {
             d.Initialize(settings, tornado);
-           // Debug.Log("axis = " + d.semiMajorAxis);
         }
 
     }
@@ -34,11 +32,12 @@ public class DebrisManager : MonoBehaviour
             for (int i = 0; i < debris.Length; i++)
             {
                 debrisData[i].displacementXZ = debris[i].displacementXZ;
-                  // Debug.Log("displacement = " + debris[i].displacementXZ);
-                 //  Debug.Log("SMaM = " + debris[i].semiMajorAxis);
                 debrisData[i].rotation = debris[i].transform.rotation;
+                debrisData[i].currentAngle = debris[i].currentAngle;
+                debrisData[i].semiMajorAxis = debris[i].semiMajorAxis;
+                debrisData[i].semiMinorAxis = debris[i].semiMinorAxis;
+                debrisData[i].phase = debris[i].phase;
             }
-         //   Debug.Log("DebrisData size: " + DebrisData.Size);
             var debrisBuffer = new ComputeBuffer(numDebris, DebrisData.Size);
             debrisBuffer.SetData(debrisData);
 
@@ -49,22 +48,22 @@ public class DebrisManager : MonoBehaviour
 
 
             int threadGroups = Mathf.CeilToInt(numDebris / (float)threadGroupSize);
-         //   Debug.Log("number of thread groups: "+threadGroups);
             compute.Dispatch(0, threadGroups, 1, 1);
-
+        
             debrisBuffer.GetData(debrisData);
 
             for (int i = 0; i < debris.Length; i++)
             {
-                if (i == 3)
-                {
-                  //  Debug.Log("position 3 = " + debris[i].displacementXZ + ", buffer 3 = " + debrisData[i].displacementXZ + ", currentAngle 3 = " + debris[i].currentAngle);
-                };
+            
 
                 debris[i].displacementXZ = debrisData[i].displacementXZ;
                 debris[i].transform.rotation = debrisData[i].rotation;
+                debris[i].currentAngle = debrisData[i].currentAngle;
                 debris[i].UpdateDebris();
-                
+                if (i == 3)
+                {
+                      //  Debug.Log("buffer rot 3 = " + debrisData[i].rotation);
+                };
             }
 
             debrisBuffer.Release();

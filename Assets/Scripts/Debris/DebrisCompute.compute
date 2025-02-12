@@ -9,7 +9,7 @@ struct Debris
     float semiMajorAxis;
     float semiMinorAxis;
     float phase;
-    float currentAngle;    
+    float currentAngle;
 };
 
 RWStructuredBuffer<Debris> debris;
@@ -22,15 +22,15 @@ float _MaxTumbleSpeed;
 void CSMain(uint3 id : SV_DispatchThreadID)
 {
     float radius = length(debris[id.x].displacementXZ);
-    debris[id.x].currentAngle = 0.5; // _MaxOrbitSpeed / (radius + 1) * _ElapsedTime;
-    //float x = debris[id.x].semiMajorAxis * cos(debris[id.x].currentAngle + (debris[id.x].phase * PI / 180));
-    //float z = debris[id.x].semiMinorAxis * sin(debris[id.x].currentAngle + (debris[id.x].phase * PI / 180));
-    //debris[id.x].displacementXZ = float2(x, z);
+    debris[id.x].currentAngle += _MaxOrbitSpeed / (radius + 1) * _ElapsedTime;
+    float dispX = debris[id.x].semiMajorAxis * cos(debris[id.x].currentAngle);
+    float dispZ = debris[id.x].semiMinorAxis * sin(debris[id.x].currentAngle);
+    debris[id.x].displacementXZ = float2(dispX, dispZ);
     
-    //float tumbleRotation = (_MaxTumbleSpeed / (radius + 1)) * _ElapsedTime;
-    //debris[id.x].rotation = float4(debris[id.x].rotation.x + tumbleRotation,
-    //                                debris[id.x].rotation.y,
-    //                                debris[id.x].rotation.z,
-    //                                debris[id.x].rotation.w);
+    float tumbleRotation = (_MaxTumbleSpeed / (radius + 1)) * _ElapsedTime;
+    debris[id.x].rotation = float4(debris[id.x].rotation.x + tumbleRotation,
+                                    debris[id.x].rotation.y,
+                                    debris[id.x].rotation.z,
+                                    debris[id.x].rotation.w);
 
 }

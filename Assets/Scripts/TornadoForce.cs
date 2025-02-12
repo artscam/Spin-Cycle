@@ -6,9 +6,11 @@ public class TornadoForce : MonoBehaviour
 {
     // compute force on attached object
     public GameObject tornado;
+    public TornadoBehaviour tornado_behaviour;
     public float maxStrength = 10000;
     public float radius = 40;
     public float height = 20;
+    private int rotation = -1;
 
     Rigidbody car;
     public GameObject centreOfLift;
@@ -20,6 +22,7 @@ public class TornadoForce : MonoBehaviour
     void Start()
     {
         car = GetComponent<Rigidbody>();
+        rotation = tornado_behaviour.rotation;
     }
 
     // Update is called once per frame
@@ -33,9 +36,9 @@ public class TornadoForce : MonoBehaviour
             //localStrength = maxStrength * Mathf.Exp(-Mathf.Pow(proximity, 2) / (2 * Mathf.Pow(radius,2)));
             localStrength = maxStrength / (1+Mathf.Pow(proximity/radius, 2));
             tornadoForce.y = 1.5f*localStrength;
-            // Create a radial inward force + slight perpendicular anticlockwise acceleration 
-            tornadoForce.x = localStrength * (displacement.x + displacement.y)/ proximity;
-            tornadoForce.z = localStrength * (displacement.y - displacement.x) / proximity;
+            // Create a radial inward force + slight perpendicular anticlockwise acceleration if rotation = -1
+            tornadoForce.x = -rotation * localStrength * (displacement.x + displacement.y)/ proximity;
+            tornadoForce.z = -rotation * localStrength * (displacement.y - displacement.x) / proximity;
             car.AddForce(tornadoForce);
             car.AddForceAtPosition(tornadoForce,centreOfLift.transform.position);
         }
